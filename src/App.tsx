@@ -22,13 +22,15 @@ export function App () {
         <Container>
             <Menu />
         </Container>
+
         <Container>
             <CountDown />
         </Container>
+
         <Container>
             <form className='form' action=''>
                 <div className="formRow">
-                    <DefaultInput id='meuInput' type='text' lableText='Tasks:' placeholder='Digite algo' />
+                    <DefaultInput id='meuInput' type='text' lableText='tasks:' placeholder='Digite algo' />
                 </div>
 
                 <div className="forRow">
@@ -44,6 +46,7 @@ export function App () {
                 </div>
             </form>
         </Container>
+
         <Container>
             <Footer />
         </Container>
