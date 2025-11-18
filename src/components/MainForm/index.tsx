@@ -6,18 +6,23 @@ import type React from "react";
 import { useState } from "react";
 import type { TaskModel } from "../../Models/TaskModel";
 import { useTaskContext } from "../../contexts/TaskContext/UseTaskContext";
+import { getNextCycle } from "../../utils/getNextCycle";
+import { getNExtCycleType } from "../../utils/getNextCycleTypes";
 
 type AvailableColor = 'green' | 'red'
 
 export function MainForm () {
     const [taskName, SetTaskName] = useState('')
-    const { setState } = useTaskContext()
+    const { state, setState } = useTaskContext()
     const [button, setButton] = useState<AvailableColor>('green')
 
     const buttonIcon = {
         green: <PlayCircleIcon />,
         red: <StopCircleIcon />,
     }
+
+    const nextCycle = getNextCycle(state.currentCycle)
+    const nextCycleType = getNExtCycleType(nextCycle);
 
     function handleCreateNewTask(event: React.FormEvent<HTMLFormElement>){
         event.preventDefault()
@@ -39,8 +44,8 @@ export function MainForm () {
             StartDate: Date.now(),
             completeDate: null,
             interruptDate: null,
-            duration: 1,
-            type: 'workTime',
+            duration: state.config[nextCycleType],
+            type: nextCycleType,
         };
 
         const secondsRemainig = newTask.duration * 60
@@ -50,7 +55,7 @@ export function MainForm () {
                 ...prevState,
                 config: {...prevState.config},
                 activeTask: newTask,
-                currentCycle: 1, // Provisorio
+                currentCycle: nextCycle,
                 secondsRemainig, // Provisorio
                 formattedSecondsRemaining: '00:00', // Provisorio
                 tasks: [...prevState.tasks, newTask]
