@@ -7,7 +7,7 @@ import { useState } from "react";
 import type { TaskModel } from "../../Models/TaskModel";
 import { useTaskContext } from "../../contexts/TaskContext/UseTaskContext";
 import { getNextCycle } from "../../utils/getNextCycle";
-import { getNExtCycleType } from "../../utils/getNextCycleTypes";
+import { getNextCycleType } from "../../utils/getNextCycleTypes";
 import { formatSecondsToMinutes } from "../../utils/formatSecondsToMinutes";
 
 type AvailableColor = 'green' | 'red'
@@ -23,7 +23,7 @@ export function MainForm () {
     }
 
     const nextCycle = getNextCycle(state.currentCycle)
-    const nextCycleType = getNExtCycleType(nextCycle);
+    const nextCycleType = getNextCycleType(nextCycle);
 
     function handleCreateNewTask(event: React.FormEvent<HTMLFormElement>){
         event.preventDefault()
@@ -75,6 +75,7 @@ export function MainForm () {
             placeholder='Digite algo' 
             value={taskName} 
             onChange={(e) => SetTaskName(e.target.value)} 
+            disabled={!!state.activeTask}
             />
         </div>
 
@@ -82,12 +83,14 @@ export function MainForm () {
             <p>Próximo intervalo é de 25 min</p>
         </div>
 
-        <div className="formRow">
-            <Cycles />
-        </div>
+        {state.currentCycle > 0 && (
+            <div className="formRow">
+                <Cycles />
+            </div>
+        )}
 
         <div className="forRow">
-            <DefaultButton color={button} icon={buttonIcon[button]}/>
+            <DefaultButton color={button} type="submit" icon={buttonIcon[button]}/>
         </div>
     </form>
     )
