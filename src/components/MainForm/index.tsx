@@ -8,6 +8,7 @@ import type { TaskModel } from "../../Models/TaskModel";
 import { useTaskContext } from "../../contexts/TaskContext/UseTaskContext";
 import { getNextCycle } from "../../utils/getNextCycle";
 import { getNExtCycleType } from "../../utils/getNextCycleTypes";
+import { formatSecondsToMinutes } from "../../utils/formatSecondsToMinutes";
 
 type AvailableColor = 'green' | 'red'
 
@@ -57,7 +58,7 @@ export function MainForm () {
                 activeTask: newTask,
                 currentCycle: nextCycle,
                 secondsRemainig, // Provisorio
-                formattedSecondsRemaining: '00:00', // Provisorio
+                formattedSecondsRemaining: formatSecondsToMinutes(secondsRemainig), // Provisorio
                 tasks: [...prevState.tasks, newTask]
             }
         })
