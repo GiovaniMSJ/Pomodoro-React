@@ -10,27 +10,15 @@ import { getNextCycle } from "../../utils/getNextCycle";
 import { getNextCycleType } from "../../utils/getNextCycleTypes";
 import { formatSecondsToMinutes } from "../../utils/formatSecondsToMinutes";
 
-type AvailableColor = 'green' | 'red'
-
 export function MainForm () {
     const [taskName, SetTaskName] = useState('')
     const { state, setState } = useTaskContext()
-    const [button, setButton] = useState<AvailableColor>('green')
-
-    const buttonIcon = {
-        green: <PlayCircleIcon />,
-        red: <StopCircleIcon />,
-    }
 
     const nextCycle = getNextCycle(state.currentCycle)
     const nextCycleType = getNextCycleType(nextCycle);
 
     function handleCreateNewTask(event: React.FormEvent<HTMLFormElement>){
         event.preventDefault()
-        setButton(prevEvent => {
-            const nexColorButton = prevEvent === 'green' ? 'red' : 'green'
-            return nexColorButton
-        })
 
         const taskNameValue = taskName.trim()
 
@@ -57,8 +45,8 @@ export function MainForm () {
                 config: {...prevState.config},
                 activeTask: newTask,
                 currentCycle: nextCycle,
-                secondsRemainig, // Provisorio
-                formattedSecondsRemaining: formatSecondsToMinutes(secondsRemainig), // Provisorio
+                secondsRemainig,
+                formattedSecondsRemaining: formatSecondsToMinutes(secondsRemainig),
                 tasks: [...prevState.tasks, newTask]
             }
         })
@@ -72,6 +60,12 @@ export function MainForm () {
                 activeTask: null,
                 secondsRemainig: 0,
                 formattedSecondsRemaining: '00:00',
+                tasks: prevState.tasks.map(task => {
+                    if (prevState.activeTask && prevState.activeTask.id === task.id){
+                        return {...task, interruptDate: Date.now()}
+                    }
+                    return task
+                })
             }
         })
     }
