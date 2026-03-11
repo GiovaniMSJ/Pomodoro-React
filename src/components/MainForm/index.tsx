@@ -7,30 +7,18 @@ import { useState } from "react";
 import type { TaskModel } from "../../Models/TaskModel";
 import { useTaskContext } from "../../contexts/TaskContext/UseTaskContext";
 import { getNextCycle } from "../../utils/getNextCycle";
-import { getNExtCycleType } from "../../utils/getNextCycleTypes";
+import { getNextCycleType } from "../../utils/getNextCycleTypes";
 import { formatSecondsToMinutes } from "../../utils/formatSecondsToMinutes";
-
-type AvailableColor = 'green' | 'red'
 
 export function MainForm () {
     const [taskName, SetTaskName] = useState('')
     const { state, setState } = useTaskContext()
-    const [button, setButton] = useState<AvailableColor>('green')
-
-    const buttonIcon = {
-        green: <PlayCircleIcon />,
-        red: <StopCircleIcon />,
-    }
 
     const nextCycle = getNextCycle(state.currentCycle)
-    const nextCycleType = getNExtCycleType(nextCycle);
+    const nextCycleType = getNextCycleType(nextCycle);
 
     function handleCreateNewTask(event: React.FormEvent<HTMLFormElement>){
         event.preventDefault()
-        setButton(prevEvent => {
-            const nexColorButton = prevEvent === 'green' ? 'red' : 'green'
-            return nexColorButton
-        })
 
         const taskNameValue = taskName.trim()
 
@@ -57,9 +45,27 @@ export function MainForm () {
                 config: {...prevState.config},
                 activeTask: newTask,
                 currentCycle: nextCycle,
-                secondsRemainig, // Provisorio
-                formattedSecondsRemaining: formatSecondsToMinutes(secondsRemainig), // Provisorio
+                secondsRemainig,
+                formattedSecondsRemaining: formatSecondsToMinutes(secondsRemainig),
                 tasks: [...prevState.tasks, newTask]
+            }
+        })
+    }
+
+    
+    function handleInterruptTask() {
+        setState(prevState =>{
+            return {
+                ...prevState,
+                activeTask: null,
+                secondsRemainig: 0,
+                formattedSecondsRemaining: '00:00',
+                tasks: prevState.tasks.map(task => {
+                    if (prevState.activeTask && prevState.activeTask.id === task.id){
+                        return {...task, interruptDate: Date.now()}
+                    }
+                    return task
+                })
             }
         })
     }
@@ -75,6 +81,7 @@ export function MainForm () {
             placeholder='Digite algo' 
             value={taskName} 
             onChange={(e) => SetTaskName(e.target.value)} 
+            disabled={!!state.activeTask}
             />
         </div>
 
@@ -82,12 +89,32 @@ export function MainForm () {
             <p>Próximo intervalo é de 25 min</p>
         </div>
 
-        <div className="formRow">
-            <Cycles />
-        </div>
+        {state.currentCycle > 0 && (
+            <div className="formRow">
+                <Cycles />
+            </div>
+        )}
 
         <div className="forRow">
-            <DefaultButton color={button} icon={buttonIcon[button]}/>
+            {!state.activeTask && (
+                <DefaultButton
+                    aria-label="Iniciar nova tarefa"
+                    title="Iniciar nova tarefa"
+                    type="submit"
+                    icon={<PlayCircleIcon />}
+                />
+            )}
+            {!!state.activeTask &&(
+                <DefaultButton
+                    aria-label="Interroper tarefa atual"
+                    title="Interroper tarefa atual"
+                    type="button"
+                    color="red"
+                    icon={<StopCircleIcon />}
+                    onClick={handleInterruptTask}
+                />
+            )
+        }
         </div>
     </form>
     )
