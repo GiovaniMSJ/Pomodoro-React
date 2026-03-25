@@ -15,7 +15,6 @@ export type TaskActionWithoutPayload = {
     type: TaskActionTypes.RESET_STATE
 } | {
     type: TaskActionTypes.INTERRUPT_TASK; 
-    payload: TaskModel;
 }
 
 export type TaskAcionModel = TaskActionWithPayload | TaskActionWithoutPayload
