@@ -9,13 +9,13 @@ export enum TaskActionTypes {
 export type TaskActionWithPayload = | {
     type: TaskActionTypes.START_TASK; 
     payload: TaskModel;
-} | {
-    type: TaskActionTypes.INTERRUPT_TASK; 
-    payload: TaskModel;
 }
 
 export type TaskActionWithoutPayload = {
     type: TaskActionTypes.RESET_STATE
+} | {
+    type: TaskActionTypes.INTERRUPT_TASK; 
+    payload: TaskModel;
 }
 
 export type TaskAcionModel = TaskActionWithPayload | TaskActionWithoutPayload

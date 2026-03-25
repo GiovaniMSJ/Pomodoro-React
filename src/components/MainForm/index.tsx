@@ -9,10 +9,11 @@ import { useTaskContext } from "../../contexts/TaskContext/UseTaskContext";
 import { getNextCycle } from "../../utils/getNextCycle";
 import { getNextCycleType } from "../../utils/getNextCycleTypes";
 import { formatSecondsToMinutes } from "../../utils/formatSecondsToMinutes";
+import { Tips } from "../tips";
 
 export function MainForm () {
     const [taskName, SetTaskName] = useState('')
-    const { state, setState } = useTaskContext()
+    const { state, dispatch } = useTaskContext()
 
     const nextCycle = getNextCycle(state.currentCycle)
     const nextCycleType = getNextCycleType(nextCycle);
@@ -37,40 +38,14 @@ export function MainForm () {
             type: nextCycleType,
         };
 
-        const secondsRemainig = newTask.duration * 60
+        dispatch({type: TaskActionTypes.START_TASK, payload: newTask})
 
-        setState(prevState =>{
-            return {
-                ...prevState,
-                config: {...prevState.config},
-                activeTask: newTask,
-                currentCycle: nextCycle,
-                secondsRemainig,
-                formattedSecondsRemaining: formatSecondsToMinutes(secondsRemainig),
-                tasks: [...prevState.tasks, newTask]
-            }
-        })
     }
 
-    
     function handleInterruptTask() {
-        setState(prevState =>{
-            return {
-                ...prevState,
-                activeTask: null,
-                secondsRemainig: 0,
-                formattedSecondsRemaining: '00:00',
-                tasks: prevState.tasks.map(task => {
-                    if (prevState.activeTask && prevState.activeTask.id === task.id){
-                        return {...task, interruptDate: Date.now()}
-                    }
-                    return task
-                })
-            }
-        })
+        dispatch({type: TaskActionTypes.INTERRUPT_TASK })
     }
 
-    
     return (
     <form onSubmit={handleCreateNewTask} className='form' action=''>
         <div className="formRow">
@@ -86,7 +61,7 @@ export function MainForm () {
         </div>
 
         <div className="forRow">
-            <p>Próximo intervalo é de 25 min</p>
+            <Tips />
         </div>
 
         {state.currentCycle > 0 && (
