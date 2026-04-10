@@ -1,0 +1,80 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: pomodoro
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pomodoro-react
+  namespace: pomodoro
+  labels:
+    app: pomodoro-react
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: pomodoro-react
+  template:
+    metadata:
+      labels:
+        app: pomodoro-react
+    spec:
+      containers:
+        - name: pomodoro-react
+          image: pomodoro-react:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pomodoro-react
+  namespace: pomodoro
+spec:
+  selector:
+    app: pomodoro-react
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pomodoro-react
+  namespace: pomodoro
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: pomodoro.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: pomodoro-react
+                port:
+                  number: 80
